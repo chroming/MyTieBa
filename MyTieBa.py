@@ -9,7 +9,8 @@ Header = {
         'Accept-Language':'en-US,en;q=0.5',
         'Accept-Encoding':'gzip, deflate'
 }
-#创建贴吧类
+
+#贴吧类
 class TieBaInfo(object):
 
     def __init__(self,URL):
@@ -22,14 +23,24 @@ class TieBaInfo(object):
         FirstPageUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=0'%self.HeadURL
         GetFirstPage = requests.get(FirstPageUrl,headers = Header)
         GetFirstPage.encoding = 'utf-8'
-        print GetFirstPage.text
+        #print GetFirstPage.text
         di = u'第'
         self.PageNumber = re.findall(r'%s1\/(\d*)'%di,GetFirstPage.text)[0]
+        self.TieziList = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.*?kz=\d*)',GetFirstPage.text)
+
+#帖子信息类        
+class TieziInfo(object):
+    def __init__(self,TieziUrl):
+        self.TieziUrl = TieziUrl
+
 
 
 tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
 tieba.GetFirstPageFun()
-print tieba.PageNumber
+#print tieba.PageNumber
+for tz in tieba.TieziList:
+    TieziUrl = 'http://tieba.baidu.com'+tz
+    
 
 
 
