@@ -35,11 +35,14 @@ class TieziInfo(object):
 
     def GetTieziInfoFun(self):
         GetTieziText = requests.get(self.TieziUrl,headers = Header).text
+        #print GetTieziText
         self.Tiezititle = re.findall(r'\<\/style\>\<title\>(.*?)\<\/title\>',GetTieziText)[0]
-        xyy = u'下一页</a><br/>第1/'
-        self.TieziPageNumber = re.findall(r'%s(/d*)'%xyy,GetTieziText)
+        di = u'第'
+        self.TieziPageNumber = re.findall(r'%s1\/(\d*)'%di,GetTieziText)
         lou = u'楼'
-        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,GetTieziText)
+        self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)[0]
+        self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziText,re.S)[0]
+        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
 
 
 
@@ -47,7 +50,7 @@ class TieziInfo(object):
 
 tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
 tieba.GetFirstPageFun()
-#print tieba.PageNumber
+print tieba.PageNumber
 for tz in tieba.TieziList:
     TieziUrl = 'http://tieba.baidu.com'+tz
     tiezi = TieziInfo(TieziUrl)
