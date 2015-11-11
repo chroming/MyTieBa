@@ -28,10 +28,20 @@ class TieBaInfo(object):
         self.PageNumber = re.findall(r'%s1\/(\d*)'%di,GetFirstPage.text)[0]
         self.TieziList = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.*?kz=\d*)',GetFirstPage.text)
 
-#帖子信息类        
+#帖子信息类
 class TieziInfo(object):
     def __init__(self,TieziUrl):
         self.TieziUrl = TieziUrl
+
+    def GetTieziInfoFun(self):
+        GetTieziText = requests.get(self.TieziUrl,headers = Header).text
+        self.Tiezititle = re.findall(r'\<\/style\>\<title\>(.*?)\<\/title\>',GetTieziText)[0]
+        xyy = u'下一页</a><br/>第1/'
+        self.TieziPageNumber = re.findall(r'%s(/d*)'%xyy,GetTieziText)
+        lou = u'楼'
+        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,GetTieziText)
+
+
 
 
 
@@ -40,8 +50,9 @@ tieba.GetFirstPageFun()
 #print tieba.PageNumber
 for tz in tieba.TieziList:
     TieziUrl = 'http://tieba.baidu.com'+tz
-    
-
-
-
-
+    tiezi = TieziInfo(TieziUrl)
+    tiezi.GetTieziInfoFun()
+    print tiezi.TieziPageNumber
+    for hf in tiezi.TieziHuifu:
+        print hf
+    raw_input()
