@@ -12,6 +12,7 @@ Header = {
 
 di = u'第'
 lou = u'楼'
+shuaxin = u'刷新'
 
 #贴吧类
 class TieBaInfo(object):
@@ -38,23 +39,26 @@ class TieziInfo(object):
 
     def GetTieziInfoFun(self):
         GetTieziText = requests.get(self.TieziUrl,headers = Header).text
-        print GetTieziText
+        #print GetTieziText
         self.Tiezititle = re.findall(r'\<\/style\>\<title\>(.*?)\<\/title\>',GetTieziText)[0]
-        #di = u'第'
-        self.TieziPageNumber = int(re.findall(r'%s1\/(\d*)'%di,GetTieziText)[0])
-        #lou = u'楼'
+
+        try:
+            self.TieziPageNumber = int(re.findall(r'%s1\/(\d*)'%di,GetTieziText)[0])
+        except:
+            self.TieziPageNumber = 1
+
+
         #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)[0]
         #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziText,re.S)[0]
         #self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
 
     def GetTieziHuifulist(self,Huililist):
-        #for TZi in range(0,self.TieziPageNumber*10,10):
-            #self.TieziUrllist = self.TieziUrl+'&pn=%s'%TZi
-        #print self.TieziUrllist
+
         GetTieziTextAll = requests.get(Huililist,headers = Header).text
-        print GetTieziTextAll
-        #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziTextAll)[0]
-        self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziTextAll,re.S)[0]
+        #print GetTieziTextAll
+        #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziTextAll)[0] #只能在第一页回复中使用的帖子主题获取
+        self.TieziHuifuText = re.findall(r'%s\<\/a\>\<\/div\>\<div\ class\=\"d\"\>(.*?)form action\=\"submit\"'%shuaxin,GetTieziTextAll,re.S)[0]
+        #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziTextAll,re.S)[0] #只能在第一页用的帖子主体内容获取
         #print self.TieziHuifuText
         self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
 
@@ -73,11 +77,11 @@ for tz in tieba.TieziList:
     tiezi.GetTieziInfoFun()
     print tiezi.TieziPageNumber
     for TZi in range(0,tiezi.TieziPageNumber*10,10):
-        #tiezi = TieziInfo(TieziUrl)
+
         TiezilistUrl = TieziUrl+'&pn=%s'%TZi
         tiezi.GetTieziHuifulist(TiezilistUrl)
         for hf in tiezi.TieziHuifu:
             print hf
 
 
-        raw_input()
+        #raw_input()
