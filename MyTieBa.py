@@ -10,6 +10,9 @@ Header = {
         'Accept-Encoding':'gzip, deflate'
 }
 
+di = u'第'
+lou = u'楼'
+
 #贴吧类
 class TieBaInfo(object):
 
@@ -35,14 +38,27 @@ class TieziInfo(object):
 
     def GetTieziInfoFun(self):
         GetTieziText = requests.get(self.TieziUrl,headers = Header).text
-        #print GetTieziText
+        print GetTieziText
         self.Tiezititle = re.findall(r'\<\/style\>\<title\>(.*?)\<\/title\>',GetTieziText)[0]
-        di = u'第'
-        self.TieziPageNumber = re.findall(r'%s1\/(\d*)'%di,GetTieziText)
-        lou = u'楼'
-        self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)[0]
-        self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziText,re.S)[0]
+        #di = u'第'
+        self.TieziPageNumber = int(re.findall(r'%s1\/(\d*)'%di,GetTieziText)[0])
+        #lou = u'楼'
+        #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)[0]
+        #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziText,re.S)[0]
+        #self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
+
+    def GetTieziHuifulist(self,Huililist):
+        #for TZi in range(0,self.TieziPageNumber*10,10):
+            #self.TieziUrllist = self.TieziUrl+'&pn=%s'%TZi
+        #print self.TieziUrllist
+        GetTieziTextAll = requests.get(Huililist,headers = Header).text
+        print GetTieziTextAll
+        #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziTextAll)[0]
+        self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziTextAll,re.S)[0]
+        #print self.TieziHuifuText
         self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
+
+
 
 
 
@@ -56,6 +72,12 @@ for tz in tieba.TieziList:
     tiezi = TieziInfo(TieziUrl)
     tiezi.GetTieziInfoFun()
     print tiezi.TieziPageNumber
-    for hf in tiezi.TieziHuifu:
-        print hf
-    raw_input()
+    for TZi in range(0,tiezi.TieziPageNumber*10,10):
+        #tiezi = TieziInfo(TieziUrl)
+        TiezilistUrl = TieziUrl+'&pn=%s'%TZi
+        tiezi.GetTieziHuifulist(TiezilistUrl)
+        for hf in tiezi.TieziHuifu:
+            print hf
+
+
+        raw_input()
