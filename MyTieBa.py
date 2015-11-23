@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+
 import requests
 import re
 
@@ -13,6 +14,7 @@ Header = {
 di = u'第'
 lou = u'楼'
 shuaxin = u'刷新'
+stopnum = 3
 
 #贴吧类
 class TieBaInfo(object):
@@ -28,9 +30,18 @@ class TieBaInfo(object):
         GetFirstPage = requests.get(FirstPageUrl,headers = Header)
         GetFirstPage.encoding = 'utf-8'
         #print GetFirstPage.text
-        di = u'第'
+        #di = u'第'
         self.PageNumber = re.findall(r'%s1\/(\d*)'%di,GetFirstPage.text)[0]
-        self.TieziList = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.*?kz=\d*)',GetFirstPage.text)
+        #self.TieziList = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.*?kz=\d*)',GetFirstPage.text)
+
+    def GetPageListFun(self,Allurl):
+        #for LN in range(0,stopnum,20):
+            #PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn='%self.HeadURL+str(LN)
+        GetPageList = requests.get(Allurl,headers = Header)
+        self.TieziListAll = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.{70,90}kz=\d+)',GetPageList.text)
+        print self.TieziListAll
+
+
 
 #帖子信息类
 class TieziInfo(object):
@@ -48,7 +59,7 @@ class TieziInfo(object):
             self.TieziPageNumber = 1
 
 
-        #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)[0]
+        self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziText)
         #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziText,re.S)[0]
         #self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
 
@@ -60,28 +71,35 @@ class TieziInfo(object):
         self.TieziHuifuText = re.findall(r'%s\<\/a\>\<\/div\>\<div\ class\=\"d\"\>(.*?)form action\=\"submit\"'%shuaxin,GetTieziTextAll,re.S)[0]
         #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziTextAll,re.S)[0] #只能在第一页用的帖子主体内容获取
         #print self.TieziHuifuText
-        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
-
-
-
-
+        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?span class\=\"b\"\>(\d.*?\d)\<.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
 
 
 
 tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
 tieba.GetFirstPageFun()
 print tieba.PageNumber
-for tz in tieba.TieziList:
-    TieziUrl = 'http://tieba.baidu.com'+tz
-    tiezi = TieziInfo(TieziUrl)
-    tiezi.GetTieziInfoFun()
-    print tiezi.TieziPageNumber
-    for TZi in range(0,tiezi.TieziPageNumber*10,10):
+HeadUrl = tieba.HeadURL
+for LN in range(0,stopnum*20,20):
+    print "***************************************************************************"
+    PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn='%HeadUrl+str(LN)
+    tieba.GetPageListFun(PageListUrl)
 
-        TiezilistUrl = TieziUrl+'&pn=%s'%TZi
-        tiezi.GetTieziHuifulist(TiezilistUrl)
-        for hf in tiezi.TieziHuifu:
-            print hf
+
+    for tz in tieba.TieziListAll:
+        TieziUrl = 'http://tieba.baidu.com'+tz
+        print TieziUrl
+        tiezi = TieziInfo(TieziUrl)
+        tiezi.GetTieziInfoFun()
+        print tiezi.TieziPageNumber
+        for TZi in range(0,tiezi.TieziPageNumber*10,10):
+
+            TiezilistUrl = TieziUrl+'&pn=%s'%TZi
+            tiezi.GetTieziHuifulist(TiezilistUrl)
+            for hf in tiezi.TieziHuifu:
+                print hf[0]
+                print hf[1]
+                print hf[2]
+                print hf[3]
 
 
         #raw_input()
