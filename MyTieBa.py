@@ -52,6 +52,11 @@ class TieziInfo(object):
         GetTieziText = requests.get(self.TieziUrl,headers = Header).text
         #print GetTieziText
         self.Tiezititle = re.findall(r'\<\/style\>\<title\>(.*?)\<\/title\>',GetTieziText)[0]
+        try:
+            self.TieziTime = re.findall(r'div class\=\"i\"\>1%s\..*?\<span class\=\"b\"\>(.*?)(\d{1,2}\:\d{1,2})\<\/span\>'%lou,GetTieziText)[0]
+        except:
+            self.TieziTime = (u'0',u'0')
+
 
         try:
             self.TieziPageNumber = int(re.findall(r'%s1\/(\d*)'%di,GetTieziText)[0])
@@ -68,6 +73,7 @@ class TieziInfo(object):
         GetTieziTextAll = requests.get(Huililist,headers = Header).text
         #print GetTieziTextAll
         #self.TieziZhuti = re.findall(r'div class\=\"i\"\>1%s\. (.*?)\<br\/\>\<br\/\>\<span class\=\"g\"\>'%lou,GetTieziTextAll)[0] #只能在第一页回复中使用的帖子主题获取
+        #self.TieziTime = re.findall(r'div class\=\"i\"\>1%s\..*?\<span class\=\"b\"\>(\d{1,2}\-\d{1,2}) \d{1,2}\:\d{1,2}\<'%lou,GetTieziTextAll)[0]
         self.TieziHuifuText = re.findall(r'%s\<\/a\>\<\/div\>\<div\ class\=\"d\"\>(.*?)form action\=\"submit\"'%shuaxin,GetTieziTextAll,re.S)[0]
         #self.TieziHuifuText = re.findall(r'div class\=\"i\"\>1%s\. (.*?)form action\=\"submit\"'%lou,GetTieziTextAll,re.S)[0] #只能在第一页用的帖子主体内容获取
         #print self.TieziHuifuText
@@ -91,15 +97,23 @@ for LN in range(0,stopnum*20,20):
         tiezi = TieziInfo(TieziUrl)
         tiezi.GetTieziInfoFun()
         print tiezi.TieziPageNumber
-        for TZi in range(0,tiezi.TieziPageNumber*10,10):
+        print tiezi.TieziTime
+        if tiezi.TieziTime[0] == None:
+            pass
+        else:
 
-            TiezilistUrl = TieziUrl+'&pn=%s'%TZi
-            tiezi.GetTieziHuifulist(TiezilistUrl)
-            for hf in tiezi.TieziHuifu:
-                print hf[0]
-                print hf[1]
-                print hf[2]
-                print hf[3]
+            if re.match(r'11\-\d{1,2}',tiezi.TieziTime[0]):
+                for TZi in range(0,tiezi.TieziPageNumber*10,10):
+
+                    TiezilistUrl = TieziUrl+'&pn=%s'%TZi
+                    tiezi.GetTieziHuifulist(TiezilistUrl)
+                    #print tiezi.TieziTime
+                #if re.match(r'11\-\d{1,2}',tiezi.TieziTime):
+                    for hf in tiezi.TieziHuifu:
+                        print hf[0]
+                        print hf[1]
+                        print hf[2]
+                        print hf[3]
 
 
         #raw_input()
