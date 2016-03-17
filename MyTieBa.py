@@ -3,6 +3,8 @@
 
 import requests
 import re
+from gevent import monkey
+monkey.patch_all()
 
 Header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0',
@@ -15,25 +17,26 @@ di = u'第'
 lou = u'楼'
 shuaxin = u'刷新'
 hui = u'回'
-stopnum = 3
+stopnum = 100
+
 
 
 # 贴吧类
 class TieBaInfo(object):
-    def __init__(self,URL):
+    def __init__(self, URL):
         self.HeadURL = URL
 
     # 获取首页HTML及本吧帖子总页数
     def GetFirstPageFun(self):
 
         FirstPageUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=0'%self.HeadURL
-        GetFirstPage = requests.get(FirstPageUrl,headers = Header)
+        GetFirstPage = requests.get(FirstPageUrl,headers=Header)
         GetFirstPage.encoding = 'utf-8'
-        self.PageNumber = re.findall(r'%s1\/(\d*)'%di,GetFirstPage.text)[0]
+        self.PageNumber = re.findall(r'%s1\/(\d*)' % di, GetFirstPage.text)[0]
 
     # 获取前stopnum页数的帖子URL,主题,总回复数
     def GetPageListFun(self,Allurl):
-        GetPageList = requests.get(Allurl,headers = Header)
+        GetPageList = requests.get(Allurl,headers=Header)
         self.TieziListAll = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.{70,90}kz=\d+)\&.*?\>\d*\.\&\#160\;(.*?)\<\/a\>.*?%s(\d*)'%hui,GetPageList.text)
 
 
@@ -68,10 +71,9 @@ class TieziInfo(object):
         self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br\/\>\<span class\=\"g\".*?href\=\".*?\"\>(.*?)\<\/a.*?span class\=\"b\"\>(\d.*?\d)\<.*?\<a href\=\"(flr.*?)\"'%lou, self.TieziHuifuText)
 
 
-
 def GetRealContent(content):
-    realcontent = re.sub(r'<.*?>', '', content)
-    return realcontent
+    return re.sub(r'<.*?>', '', content)
+
 
 
 tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
@@ -81,22 +83,24 @@ HeadUrl = tieba.HeadURL
 
 # 循环获取前stopnum页帖子URL
 for LN in range(0, stopnum*20, 20):
-    print "***************************************************************************"
-    PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn='%HeadUrl+str(LN)
+    #print "***************************************************************************"
+    PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=' % HeadUrl+str(LN)
     tieba.GetPageListFun(PageListUrl)
 
     # 循环帖子URL获取HTML
     for tz in tieba.TieziListAll:
         TieziUrl = 'http://tieba.baidu.com'+tz[0]
-        print tz[0], tz[1], tz[2]
+        #print tz[0], tz[1], tz[2]
         # print TieziUrl
         tiezi = TieziInfo(TieziUrl)
         tiezi.GetTieziInfoFun()
-        print tiezi.TieziPageNumber
-        print tiezi.TieziTime
-        print('------------------------')
+        print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0],tiezi.TieziTime[1]
+        #print tiezi.TieziPageNumber
+        #print tiezi.TieziTime
+        #print('------------------------')
         if tiezi.TieziTime[0] is not None:
-            if re.match(r'3\-\d{1,2}', tiezi.TieziTime[0]):
+            if 1==2:
+            #if re.match(r'3\-\d{1,2}', tiezi.TieziTime[0]):
                 for TZi in range(0, tiezi.TieziPageNumber*10, 10):
 
                     TiezilistUrl = TieziUrl+'&pn=%s'%TZi
@@ -110,5 +114,3 @@ for LN in range(0, stopnum*20, 20):
                         print hf[2]
                         print hf[3]
 
-
-        raw_input()
