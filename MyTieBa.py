@@ -83,7 +83,7 @@ for LN in range(0,stopnum*20,20):
     #循环帖子URL获取HTML
     for tz in tieba.TieziListAll:
         TieziUrl = 'http://tieba.baidu.com'+tz[0]
-        print tz
+        print tz[0],tz[1],tz[2]
         #print TieziUrl
         tiezi = TieziInfo(TieziUrl)
         tiezi.GetTieziInfoFun()
@@ -91,11 +91,12 @@ for LN in range(0,stopnum*20,20):
         print tiezi.TieziTime
         print('------------------------')
         if tiezi.TieziTime[0] is not None:
-            if re.match(r'10\-\d{1,2}',tiezi.TieziTime[0]):
+            if re.match(r'3\-\d{1,2}',tiezi.TieziTime[0]):
                 for TZi in range(0,tiezi.TieziPageNumber*10,10):
 
                     TiezilistUrl = TieziUrl+'&pn=%s'%TZi
                     tiezi.GetTieziHuifulist(TiezilistUrl)
+                    #print tiezi.TieziHuifu
                     for hf in tiezi.TieziHuifu:
                         print hf[0]
                         print hf[1]
@@ -103,4 +104,4 @@ for LN in range(0,stopnum*20,20):
                         print hf[3]
 
 
-        #raw_input()
+        raw_input()
