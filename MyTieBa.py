@@ -50,7 +50,7 @@ class TieziInfo(object):
         GetTieziText = requests.get(self.TieziUrl, headers=Header).text
         self.Tiezititle = re.findall(r'</style><title>(.*?)</title>', GetTieziText)[0]
         try:
-            self.TieziTime = re.findall(r'div class\=\"i\">1%s\..*?<span class\=\"b\">(.*?)(\d{1,2}\:\d{1,2})</span>' % lou, GetTieziText)[0]
+            self.TieziTime = re.findall(r'div class\=\"i\">1%s\..*?<span class=\"b\">(.*?)(\d{1,2}:\d{1,2})?</span>' % lou, GetTieziText)[0]
         except:
             self.TieziTime = (u'0', u'0')
 
