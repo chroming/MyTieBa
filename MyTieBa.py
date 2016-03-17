@@ -65,7 +65,8 @@ class TieziInfo(object):
 
         GetTieziTextAll = requests.get(Huililist,headers = Header).text
         self.TieziHuifuText = re.findall(r'%s\<\/a\>\<\/div\>\<div\ class\=\"d\"\>(.*?)form action\=\"submit\"'%shuaxin,GetTieziTextAll,re.S)[0]
-        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br.*?href\=\".*?\"\>(.*?)\<\/a.*?span class\=\"b\"\>(\d.*?\d)\<.*?\<a href\=\"(flr.*?)\"'%lou,self.TieziHuifuText)
+        # 以下正则组匹配内容依次为:帖子楼层;帖子内容;回帖ID;回帖时间;回帖链接
+        self.TieziHuifu = re.findall(r'div class\=\"i\"\>(\d*)%s\. (.*?)\<br\/\>\<span class\=\"g\".*?href\=\".*?\"\>(.*?)\<\/a.*?span class\=\"b\"\>(\d.*?\d)\<.*?\<a href\=\"(flr.*?)\"'%lou, self.TieziHuifuText)
 
 
 
