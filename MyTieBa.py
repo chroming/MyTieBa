@@ -3,8 +3,10 @@
 
 import requests
 import re
-from gevent import monkey
-monkey.patch_all()
+#import threading
+#import gevent.monkey; gevent.monkey.patch_thread()
+#from gevent import monkey
+#monkey.patch_all()
 
 Header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0',
@@ -17,7 +19,7 @@ di = u'第'
 lou = u'楼'
 shuaxin = u'刷新'
 hui = u'回'
-stopnum = 100
+stopnum = 10
 
 
 
@@ -35,8 +37,8 @@ class TieBaInfo(object):
         self.PageNumber = re.findall(r'%s1\/(\d*)' % di, GetFirstPage.text)[0]
 
     # 获取前stopnum页数的帖子URL,主题,总回复数
-    def GetPageListFun(self,Allurl):
-        GetPageList = requests.get(Allurl,headers=Header)
+    def GetPageListFun(self, Allurl):
+        GetPageList = requests.get(Allurl, headers=Header)
         self.TieziListAll = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.{70,90}kz=\d+)\&.*?\>\d*\.\&\#160\;(.*?)\<\/a\>.*?%s(\d*)'%hui,GetPageList.text)
 
 
