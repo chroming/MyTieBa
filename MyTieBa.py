@@ -3,6 +3,7 @@
 
 import requests
 import re
+import MySQLdb
 #import threading
 #import gevent.monkey; gevent.monkey.patch_thread()
 #from gevent import monkey
@@ -19,6 +20,7 @@ di = u'第'
 lou = u'楼'
 shuaxin = u'刷新'
 hui = u'回'
+# 截止页指手机页面的截止页,每页20个帖子
 stopnum = 10
 
 
@@ -39,6 +41,7 @@ class TieBaInfo(object):
     # 获取前stopnum页数的帖子URL,主题,总回复数
     def GetPageListFun(self, Allurl):
         GetPageList = requests.get(Allurl, headers=Header)
+        # 以下正则组匹配内容依次为:URl,主题,回帖数
         self.TieziListAll = re.findall(r'class\=\"i.{0,3}\"\>\<a.href\=\"(.{70,90}kz=\d+)\&.*?\>\d*\.\&\#160\;(.*?)\<\/a\>.*?%s(\d*)'%hui,GetPageList.text)
 
 
@@ -83,6 +86,10 @@ tieba.GetFirstPageFun()
 print tieba.PageNumber
 HeadUrl = tieba.HeadURL
 
+tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb")
+cursor = tbdb.cursor()
+
+
 # 循环获取前stopnum页帖子URL
 for LN in range(0, stopnum*20, 20):
     #print "***************************************************************************"
@@ -96,7 +103,16 @@ for LN in range(0, stopnum*20, 20):
         # print TieziUrl
         tiezi = TieziInfo(TieziUrl)
         tiezi.GetTieziInfoFun()
-        print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0],tiezi.TieziTime[1]
+        print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1]
+        sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1])
+
+        try:
+            cursor.execute(sql)
+            tbdb.commit()
+        except:
+            print("Error")
+            tbdb.rollback()
+
         #print tiezi.TieziPageNumber
         #print tiezi.TieziTime
         #print('------------------------')
@@ -116,3 +132,4 @@ for LN in range(0, stopnum*20, 20):
                         print hf[2]
                         print hf[3]
 
+tbdb.close()
