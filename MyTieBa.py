@@ -21,8 +21,7 @@ lou = u'楼'
 shuaxin = u'刷新'
 hui = u'回'
 # 截止页指手机页面的截止页,每页20个帖子
-stopnum = 10
-
+# stopnum = 10
 
 
 # 贴吧类
@@ -80,56 +79,70 @@ def GetRealContent(content):
     return re.sub(r'<.*?>', '', content)
 
 
+def getinfo(stopnum, tieba):
+    tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb")
+    cursor = tbdb.cursor()
+    HeadUrl = tieba.HeadURL
+    # 循环获取前stopnum页帖子URL
+    for LN in range(0, stopnum*20, 20):
+        # print "***************************************************************************"
+        PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=' % HeadUrl+str(LN)
+        tieba.GetPageListFun(PageListUrl)
 
-tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
-tieba.GetFirstPageFun()
-print tieba.PageNumber
-HeadUrl = tieba.HeadURL
+        # 循环帖子URL获取HTML
+        for tz in tieba.TieziListAll:
+            TieziUrl = 'http://tieba.baidu.com'+tz[0]
+            # print tz[0], tz[1], tz[2]
+            # print TieziUrl
+            tiezi = TieziInfo(TieziUrl)
+            tiezi.GetTieziInfoFun()
+            print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1]
+            sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1])
 
-tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb")
-cursor = tbdb.cursor()
+            try:
+                cursor.execute(sql)
+                tbdb.commit()
+            except:
+                print("Error")
+                tbdb.rollback()
+
+            # print tiezi.TieziPageNumber
+            # print tiezi.TieziTime
+            # print('------------------------')
+            if tiezi.TieziTime[0] is not None:
+                if 1 == 2:
+                # 判断帖子时间的代码.暂时不使用
+                #if re.match(r'3\-\d{1,2}', tiezi.TieziTime[0]):
+                    for TZi in range(0, tiezi.TieziPageNumber*10, 10):
+
+                        TiezilistUrl = TieziUrl+'&pn=%s'%TZi
+                        tiezi.GetTieziHuifulist(TiezilistUrl)
+                        #print tiezi.TieziHuifu
+                        for hf in tiezi.TieziHuifu:
+                            realcontent = GetRealContent(hf[1])
+                            print hf[0]
+                            print realcontent
+                            print len(realcontent)
+                            print hf[2]
+                            print hf[3]
+    tbdb.close()
 
 
-# 循环获取前stopnum页帖子URL
-for LN in range(0, stopnum*20, 20):
-    #print "***************************************************************************"
-    PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=' % HeadUrl+str(LN)
-    tieba.GetPageListFun(PageListUrl)
+def main():
+    tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
+    tieba.GetFirstPageFun()
+    print("本吧帖子总页数: "+str(tieba.PageNumber))
 
-    # 循环帖子URL获取HTML
-    for tz in tieba.TieziListAll:
-        TieziUrl = 'http://tieba.baidu.com'+tz[0]
-        #print tz[0], tz[1], tz[2]
-        # print TieziUrl
-        tiezi = TieziInfo(TieziUrl)
-        tiezi.GetTieziInfoFun()
-        print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1]
-        sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1])
+    try:
+        stopnum = int(raw_input("请输入需要抓取的页数,贴子数=页数*20: "))
+        if stopnum > 50:
+            print("页数不能超过50!请重新输入!")
+            main()
+        else:
+            getinfo(stopnum, tieba)
+    except:
+        print("页数只能为数字!请重新输入!")
+        main()
 
-        try:
-            cursor.execute(sql)
-            tbdb.commit()
-        except:
-            print("Error")
-            tbdb.rollback()
-
-        #print tiezi.TieziPageNumber
-        #print tiezi.TieziTime
-        #print('------------------------')
-        if tiezi.TieziTime[0] is not None:
-            if 1==2:
-            #if re.match(r'3\-\d{1,2}', tiezi.TieziTime[0]):
-                for TZi in range(0, tiezi.TieziPageNumber*10, 10):
-
-                    TiezilistUrl = TieziUrl+'&pn=%s'%TZi
-                    tiezi.GetTieziHuifulist(TiezilistUrl)
-                    # print tiezi.TieziHuifu
-                    for hf in tiezi.TieziHuifu:
-                        realcontent = GetRealContent(hf[1])
-                        print hf[0]
-                        print realcontent
-                        print len(realcontent)
-                        print hf[2]
-                        print hf[3]
-
-tbdb.close()
+if __name__ == '__main__':
+    main()
