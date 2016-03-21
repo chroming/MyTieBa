@@ -33,7 +33,7 @@
 
 + 创建tiebadb数据库：
 
-`create database tiebadb;`
+`create database tiebadb character set utf8;`
 
 + 选择tiebadb数据库：
 
@@ -68,6 +68,4 @@
 按回帖页数的倒序显示帖子标题，回帖数，回帖页数列：
 
 `select distinct topic,revertnm,pagenm from tiezilist order by pagenm desc;`
-
-
 
