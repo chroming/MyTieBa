@@ -132,17 +132,17 @@ def main():
     tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
     tieba.GetFirstPageFun()
     print("本吧帖子总页数: "+str(tieba.PageNumber))
-
     try:
         stopnum = int(raw_input("请输入需要抓取的页数,贴子数=页数*20: "))
+    except :
+        print("页数只能为数字!请重新输入!")
+        main()
+    finally:
         if stopnum > 50:
             print("页数不能超过50!请重新输入!")
             main()
         else:
             getinfo(stopnum, tieba)
-    except:
-        print("页数只能为数字!请重新输入!")
-        main()
 
 if __name__ == '__main__':
     main()
