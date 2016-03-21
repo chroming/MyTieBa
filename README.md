@@ -47,7 +47,7 @@
 
 + 建立程序使用的用户并赋予权限：
 
-`create user pub@localhost identified by 'password'；`
+`create user pub@localhost identified by 'password';`
 
 `grant all on tiebadb.* to 'pub'@'localhost';`
 
@@ -68,8 +68,6 @@
 按回帖页数的倒序显示帖子标题，回帖数，回帖页数列：
 
 `select distinct topic,revertnm,pagenm from tiezilist order by pagenm desc;`
-
-
 
 
 
