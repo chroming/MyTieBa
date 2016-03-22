@@ -41,7 +41,7 @@
 
 + 创建tiezilist数据表并定义列：
 
-`create table tiezilist(url varchar(10000),topic varchar(10000),revertnm int(10),pagenm int(10),date varchar(30),time varchar(30));`
+`create table tiezilist(url varchar(300),topic varchar(300),revertnm int(10),pagenm int(10),pgdate date,pgtime time;`
 
 此处定义了六个列，分别用于存放帖子URL，标题，回复数，回复页数，发帖日期，发帖时间。
 
@@ -68,4 +68,3 @@
 按回帖页数的倒序显示帖子标题，回帖数，回帖页数列：
 
 `select distinct topic,revertnm,pagenm from tiezilist order by pagenm desc;`
-
