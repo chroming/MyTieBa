@@ -4,10 +4,12 @@
 import requests
 import re
 import MySQLdb
-#import threading
-#import gevent.monkey; gevent.monkey.patch_thread()
-#from gevent import monkey
-#monkey.patch_all()
+import sys
+if 'threading' in sys.modules:
+    del sys.modules['threading']
+import gevent.monkey
+gevent.monkey.patch_all()
+
 
 Header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0',
