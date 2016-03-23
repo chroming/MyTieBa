@@ -4,6 +4,7 @@
 import requests
 import re
 import MySQLdb
+from datetime import date
 import sys
 if 'threading' in sys.modules:
     del sys.modules['threading']
@@ -24,7 +25,7 @@ shuaxin = u'刷新'
 hui = u'回'
 # 截止页指手机页面的截止页,每页20个帖子
 # stopnum = 10
-
+today = str(date.today())
 
 # 贴吧类
 class TieBaInfo(object):
@@ -37,7 +38,7 @@ class TieBaInfo(object):
         FirstPageUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=0'%self.HeadURL
         GetFirstPage = requests.get(FirstPageUrl,headers=Header)
         GetFirstPage.encoding = 'utf-8'
-        self.PageNumber = re.findall(r'%s1\/(\d*)' % di, GetFirstPage.text)[0]
+        self.PageNumber = re.findall(r'%s1/(\d*)' % di, GetFirstPage.text)[0]
 
     # 获取前stopnum页数的帖子URL,主题,总回复数
     def GetPageListFun(self, Allurl):
@@ -82,7 +83,7 @@ def GetRealContent(content):
 
 
 def getinfo(stopnum, tieba):
-    tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb")
+    tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb", charset="utf8")
     cursor = tbdb.cursor()
     HeadUrl = tieba.HeadURL
     # 循环获取前stopnum页帖子URL
@@ -99,7 +100,16 @@ def getinfo(stopnum, tieba):
             tiezi = TieziInfo(TieziUrl)
             tiezi.GetTieziInfoFun()
             print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1]
-            sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1])
+            if tiezi.TieziTime[0]:
+                if len(tiezi.TieziTime[0]) < 6:
+                    tzdate = today[0:4] + "-" + tiezi.TieziTime[0]
+                else:
+                    tzdate = tiezi.TieziTime[0]
+            else:
+                tzdate = today
+
+            print tzdate
+            sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tzdate, tiezi.TieziTime[1])
 
             try:
                 cursor.execute(sql)
