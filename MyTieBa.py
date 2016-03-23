@@ -88,15 +88,12 @@ def getinfo(stopnum, tieba):
     HeadUrl = tieba.HeadURL
     # 循环获取前stopnum页帖子URL
     for LN in range(0, stopnum*20, 20):
-        # print "***************************************************************************"
         PageListUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=' % HeadUrl+str(LN)
         tieba.GetPageListFun(PageListUrl)
 
         # 循环帖子URL获取HTML
         for tz in tieba.TieziListAll:
             TieziUrl = 'http://tieba.baidu.com'+tz[0]
-            # print tz[0], tz[1], tz[2]
-            # print TieziUrl
             tiezi = TieziInfo(TieziUrl)
             tiezi.GetTieziInfoFun()
             print tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tiezi.TieziTime[0], tiezi.TieziTime[1]
@@ -108,7 +105,6 @@ def getinfo(stopnum, tieba):
             else:
                 tzdate = today
 
-            print tzdate
             sql = "insert into tiezilist values ('%s','%s','%s','%s','%s','%s')" % (tz[0], tz[1], tz[2], tiezi.TieziPageNumber, tzdate, tiezi.TieziTime[1])
 
             try:
@@ -118,9 +114,6 @@ def getinfo(stopnum, tieba):
                 print("Error")
                 tbdb.rollback()
 
-            # print tiezi.TieziPageNumber
-            # print tiezi.TieziTime
-            # print('------------------------')
             if tiezi.TieziTime[0] is not None:
                 if 1 == 2:
                 # 判断帖子时间的代码.暂时不使用
