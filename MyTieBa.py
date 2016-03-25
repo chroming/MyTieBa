@@ -35,8 +35,8 @@ class TieBaInfo(object):
     # 获取首页HTML及本吧帖子总页数
     def GetFirstPageFun(self):
 
-        FirstPageUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=0'%self.HeadURL
-        GetFirstPage = requests.get(FirstPageUrl,headers=Header)
+        FirstPageUrl = 'http://tieba.baidu.com/mo/m?kw=%s&lm=&pn=0' % self.HeadURL
+        GetFirstPage = requests.get(FirstPageUrl, headers=Header)
         GetFirstPage.encoding = 'utf-8'
         self.PageNumber = re.findall(r'%s1/(\d*)' % di, GetFirstPage.text)[0]
 
@@ -134,7 +134,9 @@ def getinfo(stopnum, tieba):
 
 
 def main():
-    tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
+    #tieba = TieBaInfo('%E5%8D%97%E4%BA%AC%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6')
+    tiebaname = raw_input("请输入贴吧名称: ")
+    tieba = TieBaInfo(tiebaname)
     tieba.GetFirstPageFun()
     print("本吧帖子总页数: "+str(tieba.PageNumber))
     try:
