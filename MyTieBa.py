@@ -145,8 +145,8 @@ def main():
         print("页数只能为数字!请重新输入!")
         main()
     finally:
-        if stopnum > 50:
-            print("页数不能超过50!请重新输入!")
+        if stopnum > 200:
+            print("页数不能超过200 !请重新输入!")
             main()
         else:
             getinfo(stopnum, tieba)
