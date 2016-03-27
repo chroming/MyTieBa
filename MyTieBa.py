@@ -83,7 +83,12 @@ def GetRealContent(content):
 
 
 def getinfo(stopnum, tieba):
-    tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb", charset="utf8")
+    try:
+        tbdb = MySQLdb.connect("localhost", "pub", "password", "tiebadb", charset="utf8")
+    except:
+        print("数据库连接失败!请检查MySQL是否在运行! ")
+        return None
+
     cursor = tbdb.cursor()
     HeadUrl = tieba.HeadURL
     # 循环获取前stopnum页帖子URL
