@@ -12,20 +12,6 @@ import gevent.monkey
 gevent.monkey.patch_all()
 
 
-Header = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate'
-}
-
-di = u'第'
-lou = u'楼'
-shuaxin = u'刷新'
-hui = u'回'
-# 截止页指手机页面的截止页,每页20个帖子
-# stopnum = 10
-today = str(date.today())
 
 # 贴吧类
 class TieBaInfo(object):
@@ -157,4 +143,18 @@ def main():
             getinfo(stopnum, tieba)
 
 if __name__ == '__main__':
+    Header = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:44.0) Gecko/20100101 Firefox/44.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate'
+    }
+
+    di = u'第'
+    lou = u'楼'
+    shuaxin = u'刷新'
+    hui = u'回'
+    # 截止页指手机页面的截止页,每页20个帖子
+    # stopnum = 10
+    today = str(date.today())
     main()
